@@ -1,0 +1,39 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "IConfidentialVestingModule",
+  "sourceName": "contracts/ConfidentialPaymentGate.sol",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "beneficiary",
+          "type": "address"
+        },
+        {
+          "internalType": "euint64",
+          "name": "totalAmount",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "uint256",
+          "name": "cliffTimestamp",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "vestingDuration",
+          "type": "uint256"
+        }
+      ],
+      "name": "createVest",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}

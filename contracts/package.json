@@ -1,0 +1,34 @@
+{
+  "name": "confidentialflow-contracts",
+  "version": "0.1.0",
+  "private": true,
+  "description": "ConfidentialFlow FHEVM smart contracts — Hardhat project",
+  "scripts": {
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "deploy:sepolia": "hardhat run scripts/deploy.ts --network sepolia",
+    "seed:sepolia": "hardhat run scripts/seed.ts --network sepolia",
+    "clean": "hardhat clean"
+  },
+  "dependencies": {
+    "@fhevm/solidity": "0.11.1",
+    "@openzeppelin/contracts": "^5.3.0"
+  },
+  "devDependencies": {
+    "@fhevm/hardhat-plugin": "^0.4.2",
+    "@fhevm/mock-utils": "^0.4.2",
+    "@nomicfoundation/hardhat-ethers": "^3.1.3",
+    "@nomicfoundation/hardhat-network-helpers": "^1.1.2",
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "@types/node": "^22.0.0",
+    "@zama-fhe/relayer-sdk": "0.4.1",
+    "dotenv": "^16.4.5",
+    "ethers": "^6.16.0",
+    "hardhat": "^2.28.6",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
+  },
+  "overrides": {
+    "@zama-fhe/relayer-sdk": "0.4.1"
+  }
+}

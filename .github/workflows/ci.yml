@@ -1,0 +1,66 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  contracts:
+    name: Contracts — compile & test
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: contracts
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: contracts/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Compile contracts
+        run: npm run compile
+
+      - name: Run tests
+        run: npm test
+
+  frontend:
+    name: Frontend — typecheck & build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Typecheck
+        run: pnpm run typecheck
+
+      - name: Build
+        run: pnpm run build
+        env:
+          PORT: "3000"
+          BASE_PATH: "/"
+          VITE_CUSDT_ADDRESS: "0x0000000000000000000000000000000000000001"
+          VITE_GATE_ADDRESS: "0x0000000000000000000000000000000000000002"
+          VITE_VAULT_ADDRESS: "0x0000000000000000000000000000000000000003"
+          VITE_VESTING_ADDRESS: "0x0000000000000000000000000000000000000004"
+          VITE_FLOW_REGISTRY_ADDRESS: "0x0000000000000000000000000000000000000005"

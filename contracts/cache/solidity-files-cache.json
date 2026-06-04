@@ -1,0 +1,525 @@
+{
+  "_format": "hh-sol-cache-2",
+  "files": {
+    "/home/runner/workspace/contracts/contracts/ConfidentialPaymentGate.sol": {
+      "lastModificationDate": 1780603855951,
+      "contentHash": "555adab8d25ed310a3c0311be7c403d0",
+      "sourceName": "contracts/ConfidentialPaymentGate.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "viaIR": false,
+          "evmVersion": "cancun",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@fhevm/solidity/lib/FHE.sol",
+        "@fhevm/solidity/config/ZamaConfig.sol",
+        "./interfaces/IERC7984Minimal.sol",
+        "./FlowRegistry.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.28"
+      ],
+      "artifacts": [
+        "ConfidentialPaymentGate",
+        "IConfidentialVestingModule",
+        "IConfidentialYieldVault"
+      ]
+    },
+    "/home/runner/workspace/contracts/contracts/interfaces/IERC7984Minimal.sol": {
+      "lastModificationDate": 1780603734593,
+      "contentHash": "0acc3cebe82bc76ff467f0046f218be6",
+      "sourceName": "contracts/interfaces/IERC7984Minimal.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "viaIR": false,
+          "evmVersion": "cancun",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@fhevm/solidity/lib/FHE.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.28"
+      ],
+      "artifacts": [
+        "IERC7984Minimal"
+      ]
+    },
+    "/home/runner/workspace/contracts/contracts/FlowRegistry.sol": {
+      "lastModificationDate": 1780603752471,
+      "contentHash": "b12d405499455059bef9ce14049e6c82",
+      "sourceName": "contracts/FlowRegistry.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "viaIR": false,
+          "evmVersion": "cancun",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@fhevm/solidity/config/ZamaConfig.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.28"
+      ],
+      "artifacts": [
+        "FlowRegistry"
+      ]
+    },
+    "/home/runner/workspace/contracts/fhevmTemp/@fhevm/solidity/config/ZamaConfig.sol": {
+      "lastModificationDate": 1780604777713,
+      "contentHash": "e2172ef756221e77fec25fea646b3462",
+      "sourceName": "@fhevm/solidity/config/ZamaConfig.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "viaIR": false,
+          "evmVersion": "cancun",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@fhevm/solidity/lib/FHE.sol",
+        "@fhevm/solidity/lib/Impl.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.24"
+      ],
+      "artifacts": [
+        "ZamaConfig",
+        "ZamaEthereumConfig"
+      ]
+    },
+    "/home/runner/workspace/contracts/node_modules/@fhevm/solidity/lib/FHE.sol": {
+      "lastModificationDate": 1780604672239,
+      "contentHash": "6a1d378ddeb04662455ae7dc882b5c58",
+      "sourceName": "@fhevm/solidity/lib/FHE.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "viaIR": false,
+          "evmVersion": "cancun",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./Impl.sol",
+        "./cryptography/FhevmECDSA.sol",
+        "./FheType.sol",
+        "encrypted-types/EncryptedTypes.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.24"
+      ],
+      "artifacts": [
+        "FHE",
+        "IKMSVerifier"
+      ]
+    },
+    "/home/runner/workspace/contracts/node_modules/encrypted-types/EncryptedTypes.sol": {
+      "lastModificationDate": 1780604671946,
+      "contentHash": "521a624fad71cd29fc4b7c443b41bb86",
+      "sourceName": "encrypted-types/EncryptedTypes.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "viaIR": false,
+          "evmVersion": "cancun",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.24"
+      ],
+      "artifacts": []
+    },
+    "/home/runner/workspace/contracts/node_modules/@fhevm/solidity/lib/Impl.sol": {
+      "lastModificationDate": 1780604672604,
+      "contentHash": "68866e1050079bd9720398ae0290121a",
+      "sourceName": "@fhevm/solidity/lib/Impl.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "viaIR": false,
+          "evmVersion": "cancun",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./FheType.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.24"
+      ],
+      "artifacts": [
+        "IACL",
+        "IFHEVMExecutor",
+        "IInputVerifier",
+        "Impl"
+      ]
+    },
+    "/home/runner/workspace/contracts/node_modules/@fhevm/solidity/lib/FheType.sol": {
+      "lastModificationDate": 1780604672360,
+      "contentHash": "65f472a3e319ba73ac6b19a5e8660d15",
+      "sourceName": "@fhevm/solidity/lib/FheType.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "viaIR": false,
+          "evmVersion": "cancun",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.24"
+      ],
+      "artifacts": []
+    },
+    "/home/runner/workspace/contracts/node_modules/@fhevm/solidity/lib/cryptography/FhevmECDSA.sol": {
+      "lastModificationDate": 1780604672425,
+      "contentHash": "1b1e13e26717f0d4eed5c23a4a23660d",
+      "sourceName": "@fhevm/solidity/lib/cryptography/FhevmECDSA.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "viaIR": false,
+          "evmVersion": "cancun",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "FhevmECDSA"
+      ]
+    },
+    "/home/runner/workspace/contracts/contracts/ConfidentialYieldVault.sol": {
+      "lastModificationDate": 1780603777992,
+      "contentHash": "6e585926b45befc6f1cdcf5fa24d5f11",
+      "sourceName": "contracts/ConfidentialYieldVault.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "viaIR": false,
+          "evmVersion": "cancun",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@fhevm/solidity/lib/FHE.sol",
+        "@fhevm/solidity/config/ZamaConfig.sol",
+        "./interfaces/IERC7984Minimal.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.28"
+      ],
+      "artifacts": [
+        "ConfidentialYieldVault"
+      ]
+    },
+    "/home/runner/workspace/contracts/contracts/ConfidentialVestingModule.sol": {
+      "lastModificationDate": 1780603813000,
+      "contentHash": "549ccd6f033a80bdef61e0636c0957a7",
+      "sourceName": "contracts/ConfidentialVestingModule.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "viaIR": false,
+          "evmVersion": "cancun",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@fhevm/solidity/lib/FHE.sol",
+        "@fhevm/solidity/config/ZamaConfig.sol",
+        "./interfaces/IERC7984Minimal.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.28"
+      ],
+      "artifacts": [
+        "ConfidentialVestingModule"
+      ]
+    },
+    "/home/runner/workspace/contracts/contracts/MockERC7984.sol": {
+      "lastModificationDate": 1780605076145,
+      "contentHash": "cf60513add9400fcab274afadebc97f0",
+      "sourceName": "contracts/MockERC7984.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "viaIR": false,
+          "evmVersion": "cancun",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@fhevm/solidity/lib/FHE.sol",
+        "@fhevm/solidity/config/ZamaConfig.sol",
+        "./interfaces/IERC7984Minimal.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.28"
+      ],
+      "artifacts": [
+        "MockERC7984"
+      ]
+    },
+    "/home/runner/workspace/contracts/contracts/MockGate.sol": {
+      "lastModificationDate": 1780605341128,
+      "contentHash": "cfd493705ceb831a5c90b5bc73e22c20",
+      "sourceName": "contracts/MockGate.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "viaIR": false,
+          "evmVersion": "cancun",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@fhevm/solidity/lib/FHE.sol",
+        "@fhevm/solidity/config/ZamaConfig.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.28"
+      ],
+      "artifacts": [
+        "IVaultDeposit",
+        "IVestingCreate",
+        "MockGate"
+      ]
+    }
+  }
+}

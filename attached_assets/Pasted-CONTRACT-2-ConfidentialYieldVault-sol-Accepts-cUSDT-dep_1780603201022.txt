@@ -1,0 +1,31 @@
+CONTRACT 2: ConfidentialYieldVault.sol  
+- Accepts cUSDT deposits from ConfidentialPaymentGate only
+- Tracks per-user encrypted deposit amounts (euint64) 
+- Returns a stub yield: after 24 hours, user can claim their deposit + 1% (hardcoded for demo)
+- Functions: deposit(address user, euint64 amount), claimWithYield(), getUserBalance(address user) returns (euint64)
+- Use FHE.allow() correctly so only the depositing user can decrypt their own balance
+
+CONTRACT 3: ConfidentialVestingModule.sol
+- Accepts cUSDT allocations from ConfidentialPaymentGate
+- Stores vesting schedules: cliff timestamp, total encrypted amount (euint64), amount claimed (euint64)
+- createVest(address beneficiary, euint64 totalAmount, uint256 cliffTimestamp, uint256 vestingDuration)
+- claim(): uses FHE.select to determine claimable amount based on elapsed time vs schedule — no branching on euint values
+- Only beneficiary can decrypt their own vested amount
+
+CONTRACT 4: FlowRegistry.sol (composability coordinator)
+- Stores routing configurations per sender: mapping(address => RouteConfig) where RouteConfig has (uint8 yieldPercent, uint8 vestPercent, uint8 liquidPercent) — must sum to 100
+- Called by ConfidentialPaymentGate to split a payment across vault and vesting
+- setRoute(uint8 yieldPct, uint8 vestPct, uint8 liquidPct) public
+- getRoute(address sender) public view returns (RouteConfig)
+
+--- TESTS (write these for every contract before moving to frontend) ---
+
+For each contract, write Hardhat tests in TypeScript covering:
+1. Happy path: full flow from payment → routing → vault deposit → vesting allocation
+2. Sanction block: sanctioned address cannot send
+3. ACL: non-owner cannot decrypt another user's balance (expect revert)
+4. Routing math: percentages sum correctly, amounts route to correct contracts
+5. Vesting cliff: claim before cliff reverts, claim after cliff succeeds
+6. Double-claim protection: cannot claim the same vested amount twice
+
+Minimum 20 passing tests total. Use Zama's mock FHE environment for local testing (HARDHAT_FHEVM=true).
