@@ -1,10 +1,10 @@
-/* Contract addresses — populated from env vars after deployment */
+/* Contract addresses — Sepolia deployment (2026-06-05) */
 export const CONTRACT_ADDRESSES = {
-  cUSDT:           import.meta.env.VITE_CUSDT_ADDRESS         ?? "",
-  gate:            import.meta.env.VITE_GATE_ADDRESS           ?? "",
-  vault:           import.meta.env.VITE_VAULT_ADDRESS          ?? "",
-  vesting:         import.meta.env.VITE_VESTING_ADDRESS        ?? "",
-  flowRegistry:    import.meta.env.VITE_FLOW_REGISTRY_ADDRESS  ?? "",
+  cUSDT:        "0x9A2Bc655517d22CAC4a331Cfee6Fe7271f900Ec1",
+  gate:         "0x78e9683ab9A62C8A1F12a72E05e209111f7bec40",
+  vault:        "0xEC9dC67572704d219bfd03ED8Be0f4231f659a18",
+  vesting:      "0xCB9b04eaab3D3CBb29CA1dCEA666543D53e9d190",
+  flowRegistry: "0xA55A0E3CE8d613E090580eB1f797579b192376E0",
 } as const;
 
 /* Routing modes */

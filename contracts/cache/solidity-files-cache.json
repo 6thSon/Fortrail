@@ -124,8 +124,8 @@
       ]
     },
     "/home/runner/workspace/contracts/fhevmTemp/@fhevm/solidity/config/ZamaConfig.sol": {
-      "lastModificationDate": 1780604777713,
-      "contentHash": "e2172ef756221e77fec25fea646b3462",
+      "lastModificationDate": 1780620992795,
+      "contentHash": "945d01252eaee3ca974992cce027342b",
       "sourceName": "@fhevm/solidity/config/ZamaConfig.sol",
       "solcConfig": {
         "version": "0.8.28",

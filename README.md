@@ -159,15 +159,17 @@ pnpm --filter @workspace/app run dev
 
 ---
 
-## Contract addresses (Sepolia — fill after deploy)
+## Contract addresses (Sepolia)
 
 | Contract | Address |
 |---|---|
-| FlowRegistry | — |
-| ConfidentialPaymentGate | — |
-| ConfidentialYieldVault | — |
-| ConfidentialVestingModule | — |
-| cUSDT (Zama ERC-7984) | — |
+| MockERC7984 (cUSDT) | [0x9A2Bc655517d22CAC4a331Cfee6Fe7271f900Ec1](https://sepolia.etherscan.io/address/0x9A2Bc655517d22CAC4a331Cfee6Fe7271f900Ec1) |
+| FlowRegistry | [0xA55A0E3CE8d613E090580eB1f797579b192376E0](https://sepolia.etherscan.io/address/0xA55A0E3CE8d613E090580eB1f797579b192376E0) |
+| ConfidentialPaymentGate | [0x78e9683ab9A62C8A1F12a72E05e209111f7bec40](https://sepolia.etherscan.io/address/0x78e9683ab9A62C8A1F12a72E05e209111f7bec40) |
+| ConfidentialYieldVault | [0xEC9dC67572704d219bfd03ED8Be0f4231f659a18](https://sepolia.etherscan.io/address/0xEC9dC67572704d219bfd03ED8Be0f4231f659a18) |
+| ConfidentialVestingModule | [0xCB9b04eaab3D3CBb29CA1dCEA666543D53e9d190](https://sepolia.etherscan.io/address/0xCB9b04eaab3D3CBb29CA1dCEA666543D53e9d190) |
+
+Deployed by `0x14A905eE9F79F871EaeEA20Aa932292BC472B435` on 2026-06-05.
 
 ---
 
