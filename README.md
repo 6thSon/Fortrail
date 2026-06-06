@@ -1,201 +1,185 @@
-# ConfidentialFlow
+# ConfidentialFlow — Composable Confidential Payment Rails
 
-> Composable confidential payment rails on Zama FHEVM v0.11 — amounts encrypted end-to-end.
+> Programmable encrypted payments on Zama FHEVM.
+> Send, route, and schedule private stablecoin transfers
+> with composable yield and vesting — all amounts sealed
+> end-to-end with Fully Homomorphic Encryption.
 
-ConfidentialFlow is a set of four smart contracts and a React dApp that implement fully
-encrypted payment routing on Ethereum Sepolia. Amounts are never visible in plaintext
-on-chain; all arithmetic (yield calculation, vesting fractions, balance deductions) runs
-inside the FHE coprocessor.
-
----
-
-## How It Works
-
-### 1. Connect wallet and approve gate as cUSDT operator
-
-The user connects their Ethereum wallet via RainbowKit. Before any payment can flow, the
-ConfidentialPaymentGate contract must be approved as an ERC-7984 operator on the user's
-cUSDT balance. This is a one-time on-chain call to `cUSDT.setOperator(gateAddress, expiry)`.
-The approval is tracked in localStorage and verified against the chain so users never repeat
-it unnecessarily.
-
-### 2. Deposit — amount encrypted client-side before broadcast
-
-When the user deposits, the React frontend calls the Zama Relayer SDK (`@zama-fhe/relayer-sdk/web`)
-to encrypt the amount into an FHEVM-compatible `externalEuint64` handle plus a ZK proof, all
-inside the browser. The plaintext value never leaves the client. Only the encrypted handle and
-proof are submitted on-chain. The gate contract calls `FHE.fromExternal(handle, proof)` to
-verify and convert this into a gate-internal `euint64` balance entry.
-
-### 3. Route payment — recipient, encrypted amount, and routing mode
-
-The user fills in the recipient address, the amount to send (encrypted again by the SDK on
-submission), and one of three routing modes:
-
-- **Direct Transfer** — instant confidential cUSDT transfer to the recipient.
-- **Yield Vault** — funds locked for 24 hours; recipient claims principal + 1% yield.
-- **Vesting Schedule** — creates a 30-day cliff / 180-day linear vest for the recipient.
-
-External protocols registered by the admin can also trigger routing via
-`routeFromProtocol(from, to, encAmount, mode)` without going through the user deposit flow.
-
-### 4. Sanction filter and balance gate using `FHE.select` — no reverts
-
-Inside `routePayment`, two confidential guards run before dispatch:
-
-1. **Sanction gate** — if the sender is flagged, `FHE.select(notSanctioned, amount, 0)` silently
-   zeros the amount. The transaction succeeds; the on-chain observer cannot infer sanction status.
-2. **Balance gate** — `FHE.le(requestedAmt, balance)` checks sufficiency. If insufficient,
-   `FHE.select` again zeros the send amount. No on-chain revert, no information leak.
-
-Both guards are pure FHE operations — the results are never decrypted on-chain.
-
-### 5. Funds land in the appropriate module
-
-After the guards, `_executeRoute` dispatches:
-
-- **Mode 0 (Liquid)** → `cUSDT.confidentialTransfer(recipient, sendAmt)` directly.
-- **Mode 1 (Yield)** → transfers to `ConfidentialYieldVault`, which records the encrypted
-  deposit and releases principal + yield after the 24-hour lock expires.
-- **Mode 2 (Vesting)** → transfers to `ConfidentialVestingModule`, which creates a per-beneficiary
-  vesting schedule; tokens unlock linearly after the cliff.
-
-In every path, `FHE.allow(sendAmt, recipient)` grants the recipient the ACL needed to decrypt
-their received amount off-chain via the Zama Gateway.
+**Zama Season 3 Builder Track Submission**
 
 ---
 
-## Architecture overview
+## What This Is (Plain English)
 
-```
-User → ConfidentialPaymentGate → Mode 0: direct cUSDT transfer
-                               → Mode 1: ConfidentialYieldVault  (+1% after 24 h)
-                               → Mode 2: ConfidentialVestingModule (cliff + linear)
-                FlowRegistry   ← per-sender routing config (plaintext)
-Protocol  ──(onlyAuthorizedProtocol)──► routeFromProtocol()
-```
+Public blockchains expose every transaction to anyone who looks. When you send USDT on Ethereum, the amount, recipient, and timing are all permanently visible on-chain — readable by competitors, counterparties, front-running bots, and surveillance tools alike. This makes DeFi effectively unusable for real institutional treasury flows, private payroll, confidential settlements, or any personal finance where financial privacy is a baseline expectation rather than an edge case.
 
-See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for the full design and ACL patterns.
-See [`docs/DEMO_FLOW.md`](docs/DEMO_FLOW.md) for a step-by-step demo walkthrough.
+ConfidentialFlow solves this by encrypting every payment amount end-to-end using Fully Homomorphic Encryption before it ever touches the chain. Senders encrypt amounts in the browser; the ciphertext is all that is ever written to Ethereum state. The contracts compute yield, vesting fractions, sanction checks, and balance deductions entirely inside the FHE coprocessor — without any party ever decrypting the values. A Protocol Registry lets external dApps plug in and route payments without handling FHE themselves: they pass an encrypted handle they received from the user and the protocol does the rest.
 
 ---
 
-## Repository layout
+## Architecture
 
 ```
-confidentialflow/
-├── contracts/               Hardhat project (standalone npm, not pnpm workspace)
-│   ├── contracts/
-│   │   ├── ConfidentialPaymentGate.sol
-│   │   ├── ConfidentialYieldVault.sol
-│   │   ├── ConfidentialVestingModule.sol
-│   │   ├── FlowRegistry.sol
-│   │   └── interfaces/
-│   │       └── IERC7984Minimal.sol
-│   ├── test/
-│   │   ├── ConfidentialPaymentGate.test.ts
-│   │   ├── ConfidentialYieldVault.test.ts
-│   │   ├── ConfidentialVestingModule.test.ts
-│   │   ├── FlowRegistry.test.ts
-│   │   └── MockERC7984.sol
-│   ├── scripts/
-│   │   ├── deploy.ts
-│   │   └── seed.ts
-│   ├── hardhat.config.ts
-│   └── package.json
-├── artifacts/app/           React + Vite frontend (pnpm workspace artifact)
-│   └── src/
-│       ├── pages/           Send, Dashboard, Admin
-│       ├── components/      Layout, UI primitives
-│       ├── hooks/           useTransactionFlow
-│       └── lib/             wagmi config, contract ABIs, FHEVM helpers
-├── docs/
-│   ├── ARCHITECTURE.md
-│   └── DEMO_FLOW.md
-├── .env.example
-└── .github/workflows/ci.yml
+User Wallet
+    │
+    ▼
+ConfidentialPaymentGate ──► FlowRegistry (routing config)
+    │
+    ├──► ConfidentialYieldVault (encrypted deposit → claim)
+    │
+    └──► ConfidentialVestingModule (cliff + linear release)
+
+External protocols call routeFromProtocol() on the Gate
+after registering via the Protocol Registry.
 ```
 
 ---
 
-## Quick start (contracts)
+## PaymentIntent System
 
-```bash
-cd contracts
-cp .env.example .env
-# Fill in SEPOLIA_RPC_URL, DEPLOYER_PRIVATE_KEY, CUSDT_ADDRESS
-npm install
-npm test                        # 38 tests, all passing
-npm run compile                 # Solidity compilation
-npm run deploy:sepolia          # Deploy to Sepolia
-npm run seed:sepolia            # Set operator + sample routing config
-```
+A PaymentIntent is a pre-authorized payment commitment stored on-chain. The sender encrypts an amount once and commits it to an intent record; the intent can then be executed by the sender or by any registered protocol when conditions are met — cleanly separating the declaration of payment intent from its execution. This enables protocol-triggered settlement flows where the executing party never holds or sees the plaintext amount.
 
----
-
-## Quick start (frontend)
-
-```bash
-# From repo root
-cp .env.example artifacts/app/.env
-# Fill in VITE_* addresses from deploy:sepolia output
-pnpm --filter @workspace/app run dev
-```
-
----
-
-## Environment variables
-
-| Variable | Where | Description |
+| Function | Who calls it | What it does |
 |---|---|---|
-| `SEPOLIA_RPC_URL` | contracts/.env | Infura/Alchemy Sepolia endpoint |
-| `DEPLOYER_PRIVATE_KEY` | contracts/.env | 0x-prefixed deployer private key |
-| `CUSDT_ADDRESS` | contracts/.env + app/.env | cUSDT ERC-7984 contract on Sepolia |
-| `GATE_ADDRESS` | app/.env | ConfidentialPaymentGate address |
-| `VAULT_ADDRESS` | app/.env | ConfidentialYieldVault address |
-| `VESTING_ADDRESS` | app/.env | ConfidentialVestingModule address |
-| `FLOW_REGISTRY_ADDRESS` | app/.env | FlowRegistry address |
-| `VITE_WALLETCONNECT_PROJECT_ID` | app/.env | WalletConnect v3 project ID |
+| `createPaymentIntent()` | User | Locks intent on-chain, returns `intentId` |
+| `executeIntent()` | User or registered protocol | Executes the payment |
+| `cancelIntent()` | User only | Cancels before execution |
 
 ---
 
-## Contract addresses (Sepolia)
+## Smart Contracts
 
-| Contract | Address |
-|---|---|
-| MockERC7984 (cUSDT) | [0x9A2Bc655517d22CAC4a331Cfee6Fe7271f900Ec1](https://sepolia.etherscan.io/address/0x9A2Bc655517d22CAC4a331Cfee6Fe7271f900Ec1) |
-| FlowRegistry | [0xA55A0E3CE8d613E090580eB1f797579b192376E0](https://sepolia.etherscan.io/address/0xA55A0E3CE8d613E090580eB1f797579b192376E0) |
-| ConfidentialPaymentGate | [0x78e9683ab9A62C8A1F12a72E05e209111f7bec40](https://sepolia.etherscan.io/address/0x78e9683ab9A62C8A1F12a72E05e209111f7bec40) |
-| ConfidentialYieldVault | [0xEC9dC67572704d219bfd03ED8Be0f4231f659a18](https://sepolia.etherscan.io/address/0xEC9dC67572704d219bfd03ED8Be0f4231f659a18) |
-| ConfidentialVestingModule | [0xCB9b04eaab3D3CBb29CA1dCEA666543D53e9d190](https://sepolia.etherscan.io/address/0xCB9b04eaab3D3CBb29CA1dCEA666543D53e9d190) |
+| Contract | Purpose | Key Functions |
+|---|---|---|
+| `ConfidentialPaymentGate` | Main entry point | `routePayment`, `routeFromProtocol`, `createPaymentIntent`, `executeIntent` |
+| `ConfidentialYieldVault` | Encrypted yield storage | `deposit`, `claimWithYield`, `getUserBalance` |
+| `ConfidentialVestingModule` | Time-locked allocations | `createVest`, `claim` |
+| `FlowRegistry` | Routing preferences | `setRoute`, `getRoute` |
+
+---
+
+## Deployed Contracts (Sepolia Testnet)
 
 Deployed by `0x14A905eE9F79F871EaeEA20Aa932292BC472B435` on 2026-06-05.
 
+| Contract | Address | Etherscan |
+|---|---|---|
+| ConfidentialPaymentGate | `0x78e9683ab9A62C8A1F12a72E05e209111f7bec40` | [view](https://sepolia.etherscan.io/address/0x78e9683ab9A62C8A1F12a72E05e209111f7bec40) |
+| ConfidentialYieldVault | `0xEC9dC67572704d219bfd03ED8Be0f4231f659a18` | [view](https://sepolia.etherscan.io/address/0xEC9dC67572704d219bfd03ED8Be0f4231f659a18) |
+| ConfidentialVestingModule | `0xCB9b04eaab3D3CBb29CA1dCEA666543D53e9d190` | [view](https://sepolia.etherscan.io/address/0xCB9b04eaab3D3CBb29CA1dCEA666543D53e9d190) |
+| FlowRegistry | `0xA55A0E3CE8d613E090580eB1f797579b192376E0` | [view](https://sepolia.etherscan.io/address/0xA55A0E3CE8d613E090580eB1f797579b192376E0) |
+| cUSDT (official Zama wrapper) | `0x9A2Bc655517d22CAC4a331Cfee6Fe7271f900Ec1` | [view](https://sepolia.etherscan.io/address/0x9A2Bc655517d22CAC4a331Cfee6Fe7271f900Ec1) |
+
 ---
 
-## Stack
+## Encrypted State
 
-| Layer | Technology |
+Every value in this table lives on-chain as a `euint64` FHE handle — never as a plaintext integer.
+
+| Variable | Contract | Who can decrypt |
+|---|---|---|
+| `userBalance[address]` | PaymentGate | Owner only |
+| `depositAmount[address]` | YieldVault | Depositor only |
+| `vestedAmount` | VestingModule | Beneficiary only |
+| `encryptedAmount` (intent) | PaymentGate | Sender + authorized protocols |
+
+---
+
+## For Users — How to Test
+
+1. Get Sepolia ETH from [sepoliafaucet.com](https://sepoliafaucet.com)
+2. Get testnet USDT from [app.aave.com](https://app.aave.com) (Sepolia faucet tab)
+3. Wrap USDT → cUSDT at [portfolio.zama.org](https://portfolio.zama.org)
+4. Open the app (URL from deployment output)
+5. Connect MetaMask (Sepolia network)
+6. Step 1: Approve Gate as operator (one-time transaction)
+7. Step 2: Deposit cUSDT into Gate
+8. Step 3: Route payment — choose Direct, Yield Vault, or Vesting
+9. Or: Schedule a PaymentIntent for future or protocol-triggered execution
+
+---
+
+## For Developers — Integration Guide
+
+Any registered protocol can trigger a confidential payment on behalf of a user without ever handling FHE logic directly. The flow is: (1) the user calls `createPaymentIntent()` once, which encrypts the amount and stores an intent on-chain; (2) the external protocol calls `routeFromProtocol()` referencing that intent, forwarding the encrypted handle the user already committed. The protocol handles only the `bytes32` intent ID — the FHE arithmetic stays inside the Gate.
+
+To register, the admin calls `registerProtocol(protocolAddress, description)` on the Gate. Once registered, the protocol can call:
+
+```solidity
+function routeFromProtocol(
+    address from,
+    address to,
+    euint64 encryptedAmount,
+    uint8 routingMode
+) external onlyAuthorizedProtocol
+```
+
+The calling protocol never handles FHE directly — it receives the encrypted handle from the user's prior `createPaymentIntent` call and forwards it. The Gate verifies the handle's ACL, runs the sanction and balance guards entirely in FHE, and dispatches to the appropriate module.
+
+---
+
+## Test Coverage
+
+| Category | Tests | What is verified |
+|---|---|---|
+| Gate — basic flow | 5 | Deposit, route, sanction block, ACL |
+| Yield Vault | 8 | Deposit, claim, timing, ACL |
+| Vesting Module | 9 | Cliff, linear release, double-claim |
+| Flow Registry | 10 | Route config, percentages |
+| PaymentIntent | 5 | Create, execute, protocol execute, expiry, replay |
+| **Total** | **42** | |
+
+Run with `cd contracts && npm test`.
+
+---
+
+## Measured Latency (Sepolia)
+
+_Placeholder — fill after Sepolia deployment and live testing._
+
+| Metric | Value |
 |---|---|
-| FHE | Zama FHEVM v0.11, `@fhevm/solidity` 0.11.1 |
-| Contracts | Solidity ^0.8.28 |
-| Testing | Hardhat 2.x, `@fhevm/mock-utils`, ethers v6 |
-| Network | Ethereum Sepolia |
-| Frontend | React 19, Vite 7, wagmi v2, RainbowKit v2, viem v2 |
-| Encryption client | `@zama-fhe/relayer-sdk` 0.4.1 |
-| Styling | Tailwind CSS v4, shadcn/ui |
+| Median end-to-end | TBD |
+| P90 | TBD |
+| Failure rate | TBD |
+| Avg gas per flow | ~866K (estimated from prior Season data) |
 
 ---
 
-## Security notes
+## Why FHE, Not ZK
 
-- Sanction enforcement uses `FHE.select` (not `require`) so on-chain observers cannot
-  infer sanction status from transaction revert/success patterns.
-- All `euint64` handles follow the three-rule ACL pattern: `allowThis` + `allow(user)` + `allowTransient(target)`.
-- Vault claim follows CEI (Checks-Effects-Interactions): deposit slot is zeroed before the external cUSDT transfer.
-- No `TFHE.*` calls — exclusively `FHE.*` (FHEVM v0.11 API).
-- No `requestDecryption` on-chain — all decryption is user-initiated off-chain via the Zama Gateway.
-- Protocol registry uses `onlyAdmin` + swap-and-pop array management; revoked protocols are immediately denied.
+ZK proofs verify that a static claim is true without revealing the underlying data. They work well for proving "I know a secret" or "this transaction is valid." But ZK cannot compute over shared, evolving state that multiple parties update over time — because someone has to know the plaintext to generate the proof. That makes ZK unsuitable anywhere the prover does not already hold all inputs in the clear.
+
+ConfidentialFlow's load-bearing computation is shared, evolving state. Multiple users deposit into the same yield vault. Routing percentages update per user independently. PaymentIntents are created by one party and executed by another who never held the plaintext amount. FHE lets the contract compute over all of this — additions, comparisons, divisions, conditional selects — without any party ever holding the plaintext. That is categorically impossible with ZK.
+
+---
+
+## Known Limitations
+
+- Yield returns are hardcoded at 1% for demonstration. Production would connect to Aave or a real yield source.
+- Vesting uses simplified linear release. Production would support custom cliff curves and multiple tranches.
+- The Zama Relayer is currently centralized. Zama has noted decentralization is on their roadmap.
+- PaymentIntent expiry relies on `block.timestamp` — set windows of at least 1 hour to avoid edge-case variance.
+- Gas costs for FHE operations are substantially higher than standard ERC-20 (~866K gas per end-to-end flow).
+- Yield vault holds pooled funds — subject to the same contract-level freeze risk as any DeFi protocol that holds user assets. This is a known limitation of the current USDC/USDT centralization model, not specific to this implementation.
+
+---
+
+## Setup
+
+```bash
+# Contracts
+cd contracts
+cp ../.env.example .env     # fill in SEPOLIA_RPC_URL, PRIVATE_KEY, ETHERSCAN_API_KEY
+npm install
+npm test                    # run test suite
+npm run compile             # Solidity compilation
+npm run deploy:sepolia      # deploy all 4 contracts
+npm run seed:sepolia        # set operator + sample routing config
+
+# Frontend (from repo root)
+pnpm --filter @workspace/app run dev
+```
 
 ---
 
