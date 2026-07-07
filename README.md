@@ -1,4 +1,4 @@
-# FortRail — Composable Confidential Payment Rails
+# FortRail The Composable Confidential Payment Rails
 
 > Programmable encrypted payments on Zama FHEVM.
 > Send, route, and schedule private stablecoin transfers
@@ -11,7 +11,7 @@
 
 ---
 
-## What This Is (Plain English)
+## What This Is?
 
 Public blockchains expose every transaction to anyone who looks. When you send USDT on Ethereum, the amount, recipient, and timing are all permanently visible on-chain — readable by competitors, counterparties, front-running bots, and surveillance tools alike. This makes DeFi effectively unusable for real institutional treasury flows, private payroll, confidential settlements, or any personal finance where financial privacy is a baseline expectation rather than an edge case.
 
